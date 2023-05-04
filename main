@@ -1,0 +1,87 @@
+import tkinter as tk
+from tkinter import ttk
+from PIL import ImageTk, Image
+
+# Define menu items
+menu_items = [
+    {"name": "Spaghetti", "price": 8.99, "description": "Classic Italian spaghetti with marinara sauce"},
+    {"name": "Sushi", "price": 12.99, "description": "Freshly rolled sushi with your choice of filling"},
+    {"name": "Steak", "price": 16.99, "description": "Juicy steak cooked to perfection"},
+    
+]
+
+class MenuApp:
+    def __init__(self, master):
+        self.master = master
+        master.title("All-You-Can-Eat Restaurant Menu")
+
+
+        self.menu_frame = ttk.Frame(master, padding=20)
+        self.menu_frame.grid(row=0, column=0)
+
+        for i, item in enumerate(menu_items):
+            item_frame = ttk.Frame(self.menu_frame, padding=10, relief="groove")
+            item_frame.grid(row=i, column=0, padx=10, pady=10)
+
+            name_label = ttk.Label(item_frame, text=item["name"], font=("Arial", 16, "bold"))
+            name_label.pack()
+
+            price_label = ttk.Label(item_frame, text="${:.2f}".format(item["price"]), font=("Arial", 12))
+            price_label.pack()
+
+            description_label = ttk.Label(item_frame, text=item["description"], font=("Arial", 12))
+            description_label.pack()
+
+
+            try:
+                img = ImageTk.PhotoImage(Image.open(item["image"]))
+                img_label = ttk.Label(item_frame, image=img)
+                img_label.pack()
+            except:
+                pass
+
+
+            add_button = ttk.Button(item_frame, text="Add to Cart", command=lambda item=item: self.add_to_cart(item))
+            add_button.pack()
+
+
+        self.cart = {}
+        self.cart_frame = ttk.Frame(master, padding=20, relief="groove")
+        self.cart_frame.grid(row=0, column=1, padx=20)
+
+        cart_label = ttk.Label(self.cart_frame, text="Checkout Cart", font=("Arial", 16, "bold"))
+        cart_label.pack()
+
+        self.cart_items_frame = ttk.Frame(self.cart_frame, padding=10)
+        self.cart_items_frame.pack()
+
+        self.total_label = ttk.Label(self.cart_frame, text="Total: $0.00", font=("Arial", 12))
+        self.total_label.pack()
+
+
+        self.close_button = ttk.Button(master, text="Close", command=master.quit)
+        self.close_button.grid(row=1, column=0, pady=20)
+
+    def add_to_cart(self, item):
+        if item["name"] in self.cart:
+            self.cart[item["name"]]["quantity"] += 1
+        else:
+            self.cart[item["name"]] = {
+                "price": item["price"],
+                "quantity": 1
+            }
+
+
+        for widget in self.cart_items_frame.winfo_children():
+            widget.destroy()
+
+        for i, (name, item) in enumerate(self.cart.items()):
+            item_frame = ttk.Frame(self.cart_items_frame, padding=5)
+            item_frame.grid(row=i, column=0, sticky="W")
+
+            name_label = ttk.Label(item_frame, text=name, font=("Arial", 12))
+            name_label.pack
+
+root = tk.Tk()
+app = MenuApp(root)
+root.mainloop()
